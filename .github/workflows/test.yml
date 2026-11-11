@@ -22,8 +22,13 @@ jobs:
       - name: Install and test
         shell: pwsh
         run: |
-          scoop bucket add jazyk $env:GITHUB_WORKSPACE
+          scoop bucket add jazyk https://github.com/JazykOrg/scoop-bucket
           if ($LASTEXITCODE -ne 0) { throw 'Bucket registration failed' }
+          $bucket = "$env:USERPROFILE/scoop/buckets/jazyk"
+          git -C $bucket fetch --depth=1 origin $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot fetch the reviewed bucket revision' }
+          git -C $bucket checkout --detach $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot select the reviewed bucket revision' }
           scoop install jazyk/jazyk
           if ($LASTEXITCODE -ne 0) { throw 'Installation failed' }
           jazyk --help
