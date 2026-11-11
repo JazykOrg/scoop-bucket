@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "description": "Natural language compiler with a persistent semantic graph",
+  "homepage": "https://jazyk.org",
+  "license": "MIT",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/JazykOrg/Jazyk/releases/download/v0.2.0/jazyk-x86_64-pc-windows-msvc.zip",
+      "hash": "21977a96712685f14bc05aae4ac6563c3203adafc1fdd89f10f0832129bb5a7e"
+    }
+  },
+  "bin": "jazyk.exe",
+  "checkver": {
+    "github": "https://github.com/JazykOrg/Jazyk"
+  }
+}

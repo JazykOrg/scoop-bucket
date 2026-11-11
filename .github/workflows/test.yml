@@ -1,0 +1,32 @@
+name: Test Scoop installation
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Install Scoop
+        shell: pwsh
+        run: |
+          if (!(Get-Command scoop -ErrorAction SilentlyContinue)) {
+            Invoke-RestMethod https://get.scoop.sh -OutFile "$env:RUNNER_TEMP/install-scoop.ps1"
+            & "$env:RUNNER_TEMP/install-scoop.ps1" -RunAsAdmin
+          }
+          "$env:USERPROFILE/scoop/shims" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Install and test
+        shell: pwsh
+        run: |
+          scoop bucket add jazyk $env:GITHUB_WORKSPACE
+          if ($LASTEXITCODE -ne 0) { throw 'Bucket registration failed' }
+          scoop install jazyk/jazyk
+          if ($LASTEXITCODE -ne 0) { throw 'Installation failed' }
+          jazyk --help
+          if ($LASTEXITCODE -ne 0) { throw 'Help check failed' }
+          $prefix = scoop prefix jazyk
+          if (!(Test-Path "$prefix/lib/pdfium.dll")) { throw 'PDFium was not installed' }
